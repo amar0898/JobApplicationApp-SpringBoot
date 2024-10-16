@@ -1,16 +1,16 @@
 package com.amar.jobMicroservices.job;
 
-import com.amar.jobMicroservices.job.dto.JobWithCompanyDTO;
+import com.amar.jobMicroservices.job.dto.JobWithDTO;
 
 import java.util.List;
 
 public interface JobService {
 
-    List<JobWithCompanyDTO> findAll();
+    List<JobWithDTO> findAll();
 
     void createJob(Job job);
 
-    Job getJobById(Long id);
+    JobWithDTO getJobById(Long id);
 
     boolean deleteJobById(Long id);
 
