@@ -4,6 +4,8 @@ package com.amar.companyMicroservices.company.impl;
 import com.amar.companyMicroservices.company.Company;
 import com.amar.companyMicroservices.company.CompanyRepository;
 import com.amar.companyMicroservices.company.CompanyService;
+import com.amar.companyMicroservices.company.clients.ReviewClient;
+import com.amar.companyMicroservices.company.dto.ReviewMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,10 +13,12 @@ import java.util.Optional;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
-
     private CompanyRepository companyRepository;
-    public CompanyServiceImpl(CompanyRepository companyRepository) {
+    private ReviewClient reviewClient;
+
+    public CompanyServiceImpl(CompanyRepository companyRepository, ReviewClient reviewClient) {
      this.companyRepository = companyRepository;
+     this.reviewClient = reviewClient;
     }
 
     @Override
@@ -53,5 +57,14 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public Company getCompanyById(Long id) {
         return companyRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void updateCompanyRating(ReviewMessage reviewMessage) {
+            Company company = getCompanyById(reviewMessage.getCompanyId());
+            double averageRating = reviewClient.getAverageRating(reviewMessage.getCompanyId());
+            company.setRating(averageRating);
+            companyRepository.save(company);
+
     }
 }

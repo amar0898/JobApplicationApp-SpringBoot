@@ -1,22 +1,12 @@
-package com.amar.companyMicroservices.company;
+package com.amar.reviewMicroservices.review.dto;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+public class ReviewMessage {
 
-import java.util.List;
-
-@Entity
-public class Company {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String title;
     private String description;
     private Double rating;
-
-    public Company() {
-    }
+    private Long companyId;
 
     public Long getId() {
         return id;
@@ -26,12 +16,12 @@ public class Company {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -48,5 +38,13 @@ public class Company {
 
     public void setRating(Double rating) {
         this.rating = rating;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 }
