@@ -1,3 +1,4 @@
+version: '3.7'
 services:
   postgres:
     container_name: postgres_container
@@ -28,25 +29,114 @@ services:
     networks:
       - postgres
     restart: unless-stopped
+
+  config-server-microservice:
+    image: amar567/config-server-microservice:latest
+    container_name: config-server-microservice
+    ports:
+      - "8080:8080"
+    depends_on:
+      - serviceregistry
+    networks:
+      - microservice-network
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  serviceregistry:
+    image: amar567/serviceregistry:latest
+    container_name: serviceRegistry
+    ports:
+      - "8761:8761"
+    depends_on:
+      - rabbitmq
+      - zipkin
+      - postgres
+      - pgadmin
+    networks:
+      - microservice-network
+      - postgres
+
+  companymicroservice:
+    image: amar567/companymicroservice:latest
+    container_name: company
+    ports:
+      - "8083:8083"
+    depends_on:
+      - serviceregistry
+      - config-server-microservice
+    networks:
+      - microservice-network
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  jobmicroservice:
+    image: amar567/jobmicroservice
+    container_name: job
+    ports:
+      - "8082:8082"
+    depends_on:
+      - serviceregistry
+    networks:
+      - microservice-network
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://serviceRegistry:8761/eureka
+
+  reviewmicroservice:
+    image: amar567/reviewmicroservice
+    container_name: review
+    ports:
+      - "8084:8084"
+    depends_on:
+      - serviceregistry
+      - config-server-microservice
+    networks:
+      - microservice-network
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
-      - 9411:9411
+      - "9411:9411"
     networks:
       - postgres
+      - microservice-network
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - postgres
+      - microservice-network
+
+  api-gateway-microservice:
+    image: amar567/api-gateway-microservice
+    ports:
+      - "8085:8085"
+    depends_on:
+      - serviceregistry
+    networks:
+      - postgres
+      - microservice-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
 
 volumes:
   postgres:
   pgadmin:
 
 networks:
+  microservice-network:
+    driver: bridge
   postgres:
+    driver: bridge
