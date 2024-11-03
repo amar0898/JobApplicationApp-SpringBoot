@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job
+  labels:
+    app: job
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: job
+      labels:
+        app: job
+    spec:
+      containers:
+      - name: job
+        image: amar567/jobmicroservice
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8082
+        env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: k8s
+          - name: SPRING_CLOUD_CONFIG_FAIL_FAST
+            value: "false"
+          - name: SPRING_CLOUD_CONFIG_ENABLED
+            value: "false"
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: job
